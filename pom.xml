@@ -96,7 +96,7 @@
 	
 	    <repository>
 	      <id>nexus</id>
-	      <name>Mithun Technologies Releases Nexus Repository</name>
+	      <name>Mithun Technologies Release Nexus Repository </name>
 	      <url>http://10.0.0.132:8081/repository/walmart-release/</url>
 	    </repository>
 	    
