@@ -1,4 +1,4 @@
-pipeline {
+node {
     
     def Mavenhome = tool name: "maven3.9.2"
     
