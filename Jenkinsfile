@@ -1,5 +1,6 @@
 node {
     
+    properties([[$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
     
     def Mavenhome = tool name: "maven3.9.2"
     
