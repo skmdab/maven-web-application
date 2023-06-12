@@ -1,0 +1,41 @@
+pipeline{
+    agent any
+    
+    tools{
+        maven "maven3.9.2"
+    }
+    
+    stages{
+        stage('Checkout the code'){
+            steps{
+                checkout scmGit(branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/skmdab/maven-web-application.git']])
+            }
+        }
+        
+        stage('Build package'){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+        
+        stage('Generating the sonarqube report'){
+            steps{
+                sh "mvn clean sonar:sonar"
+            }
+        }
+        
+        stage('Upload package in artifact nexus'){
+            steps{
+                sh "mvn clean deploy"
+            }
+        }
+        
+        stage('Deploy into tomcat server'){
+            steps{
+                sshagent(['3a0789ce-3faa-4647-95b8-2b8cb8e1f5bf']){
+                    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@10.0.0.158:/opt/tomcat8/webapps/"
+                }
+            }
+        }
+    }
+}
