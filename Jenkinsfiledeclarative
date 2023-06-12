@@ -8,7 +8,7 @@ pipeline{
     stages{
         stage('Checkout the code'){
             steps{
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/skmdab/maven-web-application.git']])
+                checkout scmGit(branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/skmdab/maven-web-application.git']])
             }
         }
 
