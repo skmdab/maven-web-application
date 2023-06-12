@@ -1,23 +1,24 @@
 pipeline{
+    
     agent any
 
     tools{
         maven 'maven3.9.2'
     }
 
-    options{
-        timestamps()
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '', numToKeepStr: '3'))
-        }
+    options {
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '', numToKeepStr: '3')
+    }
+
 
     stages{
-        stage('Checkout the code'){
+        stage('checkout code'){
             steps{
                 checkout scmGit(branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/skmdab/maven-web-application.git']])
             }
         }
 
-        stage('Build the package'){
+        stage('Build the package of code'){
             steps{
                 sh "mvn clean package"
             }
@@ -29,18 +30,19 @@ pipeline{
             }
         }
 
-        stage('Upload into artifcat nexus'){
+        stage('Uploading package into artifact nexus repo'){
             steps{
                 sh "mvn clean deploy"
             }
         }
 
-        stage('Deploy into tomcat server'){
+        stage('Deplyoing into tomcat server'){
             steps{
                 sshagent(['3a0789ce-3faa-4647-95b8-2b8cb8e1f5bf']) {
-                sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@10.0.0.158:/opt/tomcat8/webapps"
-                }
+                    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@10.0.0.158:/opt/tomcat8/webapps"
             }
         }
     }
+}
+
 }
