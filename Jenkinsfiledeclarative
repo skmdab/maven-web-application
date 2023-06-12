@@ -1,3 +1,5 @@
+@Library('filintalibs') _
+
 pipeline{
     
     agent any
@@ -44,6 +46,21 @@ pipeline{
             }
         }
     }
+}
+
+post {
+  aborted {
+    sendSlackNotifications(currentBuild.result)
+  }
+  success {
+     sendSlackNotifications(currentBuild.result)
+  }
+  failure {
+    sendSlackNotifications(currentBuild.result)
+  }
+  unsuccessful {
+     sendSlackNotifications(currentBuild.result)
+  }
 }
 
 }
