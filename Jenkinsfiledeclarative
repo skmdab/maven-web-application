@@ -1,3 +1,5 @@
+@Library('filintalibs') _
+
 pipeline{
     
     agent any
