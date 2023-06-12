@@ -6,6 +6,8 @@ node {
     
     echo "Node name is: ${env.NODE_NAME}"
     
+    echo "Build name is: ${env.BUILD_NAME}"
+    
     
     properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '6', daysToKeepStr: '', numToKeepStr: '6')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([githubPush()])])
    
