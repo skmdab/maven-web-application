@@ -1,0 +1,28 @@
+node{
+    
+    def mavenHome = tool name: "maven3.9.2"
+    
+    echo "Build number is: ${env.BUILD_NUMBER}"
+    
+    stage('checkout the code'){
+        checkout scmGit(branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/skmdab/maven-web-application.git']])
+    }
+    
+    stage('build the pacakage'){
+        sh "${mavenHome}/bin/mvn clean package"
+    }
+    
+    stage('generating sonarqube report'){
+        sh "${mavenHome}/bin/mvn clean sonar:sonar"
+    }
+    
+    stage('uploading into artifact nexus'){
+        sh "${mavenHome}/bin/mvn clean deploy"
+    }
+    
+    stage('deploy into tomcat server'){
+        sshagent(['3a0789ce-3faa-4647-95b8-2b8cb8e1f5bf']) {
+        sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@10.0.0.158:/opt/tomcat8/webapps" 
+    }
+    }
+}
