@@ -48,9 +48,6 @@ pipeline{
     }
 }
 
-}
-
-
 post {
   aborted {
     sendSlackNotifications(currentBuild.result)
@@ -64,4 +61,6 @@ post {
   unsuccessful {
      sendSlackNotifications(currentBuild.result)
   }
+}
+
 }
