@@ -2,6 +2,8 @@ node{
     
     def mavenHome = tool name: "maven3.9.2"
     
+    properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '2', daysToKeepStr: '', numToKeepStr: '4')), [$class: 'JobLocalConfiguration', changeReasonComment: '']])
+    
     echo "Build number is: ${env.BUILD_NUMBER}"
     
     stage('checkout the code'){
