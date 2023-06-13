@@ -1,0 +1,33 @@
+pipeline{
+
+    agent any
+
+    tools{
+        maven 'maven3.9.2'
+    }
+
+    parameters {
+    choice choices: ['development', 'master', 'test', 'stage'], name: 'branchName'
+    }
+
+    stages{
+        stage('Checkout the code'){
+            steps{
+                git branch: "${params.branchName}", credentialsId: '222316b0-5dac-41b5-9052-c40a4e14eaa5', url: 'https://github.com/skmdab/maven-web-application.git'
+            }
+        }
+
+        stage('Run tests and build'){
+            steps{
+                parallel(
+                    Runtests: {
+                        sh "mvn clean test"
+                    },
+                    Build: {
+                        sh "mvn clean package"
+                    }
+                )
+            }
+        }
+    }
+}
