@@ -19,7 +19,7 @@ pipeline{
 
         stage('Deploying as container'){
             steps{
-                sh "docker run -d --name mvnwebapp -p 8080:9000 skmdab/mvn:1"
+                sh "docker run -d --name mvnwebapp -p 8080:8080 skmdab/mvn:1"
             }
         }
     }
