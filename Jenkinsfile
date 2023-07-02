@@ -1,32 +1,43 @@
-node {
+pipeline{
     
-    def Mavenhome = tool name: "maven3.9.2"
-    
-    echo "Build Number is: ${env.BUILD_NUMBER}"
-    
-    
-    properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([githubPush()])])
-   
-    
-    stage ('Checkout code'){
-        checkout scmGit(branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[credentialsId: '222316b0-5dac-41b5-9052-c40a4e14eaa5', url: 'https://github.com/skmdab/maven-web-application.git']])
+    agent{
+        label 'slave'
     }
+
     
-    stage ('Build'){
-        sh "${Mavenhome}/bin/mvn clean package"
-    }
-    
-    stage ('sonarqubereport'){
-        sh "${Mavenhome}/bin/mvn sonar:sonar"
-    }
-    
-    stage ('upload to artifact nexus'){
-        sh "${Mavenhome}/bin/mvn deploy"
-    }
-    
-    stage ('deploy to tomcat server'){
-        sshagent(['3a0789ce-3faa-4647-95b8-2b8cb8e1f5bf']) {
-        sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@10.0.0.158:/opt/tomcat8/webapps/"  
-    }
+    stages{
+        stage('Checkout the code'){
+            steps{
+                git branch: 'development', url: 'https://github.com/skmdab/maven-web-application.git'
+            }
+        }
+
+        stage('Build the docker image'){
+            steps{
+                sh "docker build -t skmdab/mavenwebapp:${BUILD_NUMBER} ."
+            }
+        }
+        
+        stage('Docker image push to dockerhub'){
+            steps{
+                sh "docker push skmdab/mavenwebapp:${BUILD_NUMBER}"
+            }
+        }
+
+        stage('Changed to docker-compose file'){
+            steps{
+                sh "sed -i s/VERSION/${BUILD_NUMBER}/g docker-compose.yml"
+            }
+        }
+
+        stage('Deploy into docker image'){
+            steps{
+                sshagent(['ubuntu-creds']) {
+                sh "scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@10.0.0.180:"
+                sh "ssh -o StrictHostKeyChecking=no ubuntu@10.0.0.180 docker-compose up -d"
+            }
+            }
+            
+        }
     }
 }
