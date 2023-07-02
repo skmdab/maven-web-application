@@ -1,9 +1,6 @@
 pipeline{
-    
-    agent{
-        label 'slave'
-    }
 
+    agent any
     
     stages{
         stage('Checkout the code'){
